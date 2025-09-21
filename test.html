@@ -31,7 +31,7 @@
   display: flex;
   justify-content: center;
   gap: 20px;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* 🔑 permite que los links salten de línea */
 }
 
 nav a {
@@ -44,34 +44,19 @@ nav a {
   font-size: 14px;
 }
 
-nav a:hover {
-  background: white;
-  color: black;
-}
-
-.menu-toggle {
-  display: none;
-  font-size: 26px;
-  color: white;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-
-/* 📱 En móviles */
+/* 🔑 Ajustes para pantallas pequeñas */
 @media (max-width: 768px) {
   nav {
-    display: none;
-    flex-direction: column;
+    flex-direction: column;   /* menú en columna */
     align-items: center;
     gap: 10px;
   }
 
-  nav.active {
-    display: flex;
-  }
-
-  .menu-toggle {
+  nav a {
     display: block;
+    width: 80%;              /* los botones ocupan casi todo el ancho */
+    text-align: center;
+    font-size: 16px;         /* un poco más grande para celular */
   }
 }
 
@@ -119,19 +104,17 @@ nav a:hover {
 <body>
   
   <header>
-  <h1>Feria de Emprendimiento 2025</h1>
-  <div class="menu-toggle" id="menu-toggle">☰</div>
-  <nav id="menu">
-    <a href="#" onclick="showPage('inicio')">Inicio</a>
-    <a href="#" onclick="showPage('mision')">Misión y Visión</a>
-    <a href="#" onclick="showPage('objetivos')">Objetivos</a>
-    <a href="#" onclick="showPage('proyecto')">Proyecto</a>
-    <a href="#" onclick="showPage('contacto')">Contacto</a>
-    <a href="#" onclick="showPage('participantes')">Participantes</a>
-    <a href="#" onclick="showPage('agradecimientos')">Agradecimientos</a>
-  </nav>
-</header>
-
+    <h1>Feria de Emprendimiento 2025</h1>
+    <nav>
+      <a href="#" onclick="showPage('inicio')">Inicio</a>
+      <a href="#" onclick="showPage('mision')">Misión y Visión</a>
+      <a href="#" onclick="showPage('objetivos')">Objetivos</a>
+      <a href="#" onclick="showPage('proyecto')">Proyecto</a>
+      <a href="#" onclick="showPage('contacto')">Contacto</a>
+      <a href="#" onclick="showPage('participantes')">Participantes</a>
+      <a href="#" onclick="showPage('agradecimientos')">Agradecimientos</a>
+    </nav>
+  </header>
 
   <!-- 📌 Secciones -->
   <section id="inicio" class="active">
@@ -195,14 +178,11 @@ nav a:hover {
   </section>
 
   <script>
-  const toggle = document.getElementById("menu-toggle");
-  const menu = document.getElementById("menu");
-
-  toggle.addEventListener("click", () => {
-    menu.classList.toggle("active");
-  });
-</script>
-
+    function showPage(id) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+  </script>
   <a href="index.html" id="fixed-btn">volver</a>
 
 <style>
@@ -239,6 +219,7 @@ nav a:hover {
 </style>
 </body>
 </html>
+
 
 
 
