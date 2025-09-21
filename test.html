@@ -85,15 +85,19 @@
 <body>
   <header>
     <h1>Feria de Emprendimiento 2025</h1>
-    <nav>
-      <a href="#" onclick="showPage('inicio')">Inicio</a>
-      <a href="#" onclick="showPage('mision')">Misión y Visión</a>
-      <a href="#" onclick="showPage('objetivos')">Objetivos</a>
-      <a href="#" onclick="showPage('proyecto')">Proyecto</a>
-      <a href="#" onclick="showPage('contacto')">Contacto</a>
-      <a href="#" onclick="showPage('participantes')">Participantes</a>
-      <a href="#" onclick="showPage('agradecimientos')">Agradecimientos</a>
-    </nav>
+   <nav>
+  <div class="menu-toggle" id="menu-toggle">☰</div>
+  <ul class="menu" id="menu">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="mision.html">Misión y Visión</a></li>
+    <li><a href="objetivos.html">Objetivos</a></li>
+    <li><a href="proyecto.html">Proyecto</a></li>
+    <li><a href="contacto.html">Contacto</a></li>
+    <li><a href="participantes.html">Participantes</a></li>
+    <li><a href="agradecimientos.html">Agradecimientos</a></li>
+  </ul>
+</nav>
+
   </header>
 
   <!-- 📌 Secciones -->
@@ -157,47 +161,74 @@
     <p>Agradecemos sinceramente a todas las personas que visitaron esta página, apoyaron el proyecto y creyeron en el poder de la creatividad y el emprendimiento. 💖</p>
   </section>
 
-  <script>
-    function showPage(id) {
-      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
-    }
-  </script>
+<script>
+  const toggle = document.getElementById("menu-toggle");
+  const menu = document.getElementById("menu");
+
+  toggle.addEventListener("click", () => {
+    menu.classList.toggle("active");
+  });
+</script>
+
   <a href="index.html" id="fixed-btn">volver</a>
+  <style>
 
-<style>
-  #fixed-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: black;
-    color: white;
-    border: 3px solid white;
-    padding: 10px 20px;
-    font-family: "Press Start 2P", monospace;
-    font-size: 12px;
-    text-decoration: none;
-    cursor: pointer;
-    z-index: 1000;
-    transition: all 0.2s ease-in-out;
+nav {
+  background: #111;
+  padding: 10px;
+  position: relative;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+
+.menu li a:hover {
+  background: white;
+  color: black;
+}
+
+/* Botón hamburguesa oculto en PC */
+.menu-toggle {
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
+
+/* Estilos móviles */
+@media (max-width: 768px) {
+  .menu {
+    flex-direction: column;
+    align-items: center;
+    display: none; /* oculto por defecto en móvil */
   }
 
-  #fixed-btn:hover {
-    background: white;
-    color: black;
+  .menu.active {
+    display: flex; /* aparece al tocar el ícono */
   }
 
-  /* En pantallas pequeñas (celulares) */
-  @media (max-width: 600px) {
-    #fixed-btn {
-      font-size: 10px;
-      padding: 8px 14px;
-      bottom: 10px;
-      right: 10px;
-    }
+  .menu-toggle {
+    display: block; /* visible solo en móviles */
   }
+}
 </style>
 </body>
 </html>
+
 
 
