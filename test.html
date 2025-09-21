@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8">
+  <title>Feria de Emprendimiento 2025</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      background: linear-gradient(135deg, #ffe6f0, #e6f7ff);
+      color: #333;
+    }
+
+    header {
+      background: #ff99cc;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+
+    nav a:hover {
+      background: #ff66b2;
+    }
+
+    section {
+      display: none;
+      padding: 40px;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 30px;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    h1, h2 {
+      color: #cc0066;
+      text-align: center;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    button {
+      background: #ff99cc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background: #ff66b2;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Feria de Emprendimiento 2025</h1>
+    <nav>
+      <a href="#" onclick="showPage('inicio')">Inicio</a>
+      <a href="#" onclick="showPage('mision')">Misión y Visión</a>
+      <a href="#" onclick="showPage('objetivos')">Objetivos</a>
+      <a href="#" onclick="showPage('proyecto')">Proyecto</a>
+      <a href="#" onclick="showPage('contacto')">Contacto</a>
+      <a href="#" onclick="showPage('participantes')">Participantes</a>
+      <a href="#" onclick="showPage('agradecimientos')">Agradecimientos</a>
+    </nav>
+  </header>
+
+  <!-- 📌 Secciones -->
+  <section id="inicio" class="active">
+    <h2>Bienvenidos a la Feria de Emprendimiento 2025</h2>
+    <p>
+     La Feria de Emprendimiento 2025 es un espacio creado para promover la creatividad, la innovación y el espíritu emprendedor entre los estudiantes.
+    </p>
+    <p><strong>Objetivos:</strong></p>
+    <ul>
+      <li>Fomentar la creatividad e innovación empresarial.</li>
+      <li>Promover el trabajo en equipo y la colaboración.</li>
+      <li>Fortalecer las habilidades emprendedoras en proyectos reales.</li>
+    </ul>
+  </section>
+
+  <section id="mision">
+    <h2>Misión y Visión</h2>
+    <p><strong>Misión:</strong> Crear un Administrador de Tareas intuitivo y eficiente que ayude a las personas a organizar su vida y sus proyectos con facilidad y alegría.</p>
+    <p><strong>Visión:</strong> Convertirse en una herramienta líder en organización digital, inspirando productividad y creatividad en emprendedores y estudiantes de todo el mundo.</p>
+  </section>
+
+  <section id="objetivos">
+    <h2>Objetivos de la Empresa del Administrador de Tareas</h2>
+    <p><strong>Objetivo general:</strong> Desarrollar un sistema confiable de gestión de tareas que mejore la productividad y la administración del tiempo.</p>
+    <p><strong>Objetivo especifico:</strong></p>
+    <ul>
+      <li>Crear una plataforma accesible y fácil de usar.</li>
+      <li>Ofrecer opciones de personalización para diferentes necesidades.</li>
+      <li>Integrar funciones innovadoras como recordatorios e informes.</li>
+    </ul>
+    <p><strong>Justificacion:</strong> El administrador de tareas es una herramienta esencial para estudiantes y profesionales modernos, ya que les ayuda a organizar sus responsabilidades y alcanzar sus metas de manera eficiente.</p>
+  </section>
+
+  <section id="proyecto">
+    <h2>Proyecto: Administrador de tareas</h2>
+    <p><strong>Descripcion:</strong> El administrador de tareas es una plataforma digital diseñada para ayudar a organizar las tareas diarias, proyectos y trabajos en equipo, ofreciendo funciones amigables y fáciles de usar.</p>
+    <p><strong>Materia prima:</strong> HTML, CSS, JavaScript, and open-source libraries.</p>
+    <p><strong>Precios:</strong> </p>
+  </section>
+
+  <section id="contacto">
+    <h2>Contacto
+
+    </h2>
+    <p><strong>Email:</strong> josener56711@gmail.com</p>
+    <p><strong>telefono:</strong> 3168878278</p>
+    <button onclick="window.open('https://www.google.com/maps/@3.4566833,-76.4693715,85m/data=!3m1!1e3?entry=ttu&g_ep=EgoyMDI1MDkxNy4wIKXMDSoASAFQAw%3D%3D', '_blank')"> 
+      direccion
+    </button>
+  </section>
+
+  <section id="participantes">
+    <h2>Participantes</h2>
+    <p><strong>Nombre:</strong> isaac echeverri vanegas</p>
+    <p><strong>Contribucion:</strong>pagina y producto</p>
+  </section>
+
+  <section id="agradecimientos">
+    <h2>agradecimientos</h2>
+    <p>Agradecemos sinceramente a todas las personas que visitaron esta página, apoyaron el proyecto y creyeron en el poder de la creatividad y el emprendimiento. 💖</p>
+  </section>
+
+  <script>
+    function showPage(id) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+  </script>
+  <a href="index.html" id="fixed-btn">volver</a>
+
+<style>
+  #fixed-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: black;
+    color: white;
+    border: 3px solid white;
+    padding: 10px 20px;
+    font-family: "Press Start 2P", monospace;
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.2s ease-in-out;
+  }
+
+  #fixed-btn:hover {
+    background: white;
+    color: black;
+  }
+
+  /* En pantallas pequeñas (celulares) */
+  @media (max-width: 600px) {
+    #fixed-btn {
+      font-size: 10px;
+      padding: 8px 14px;
+      bottom: 10px;
+      right: 10px;
+    }
+  }
+</style>
+</body>
+</html>
+
+

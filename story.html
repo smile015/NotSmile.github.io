@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="utf-8" />
+  <title>Smile's Story</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    :root { --bg:#000; --fg:#fff; --box-w:760px; }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:"Press Start 2P",monospace}
+    .center{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+
+    /* Dialogue box */
+    #cuadro {
+      width: var(--box-w);
+      background:#000;
+      border:3px solid #fff;
+      padding:18px;
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+      cursor:pointer;
+      border-radius:6px;
+      user-select:none;
+    }
+    #portrait {
+      width:96px;height:96px;object-fit:contain;
+      image-rendering:pixelated;flex:0 0 96px;
+    }
+    #texto { flex:1;font-size:16px;line-height:1.4;white-space:pre-wrap;min-height:96px; }
+    #hint{font-size:10px;opacity:0.7;margin-top:8px}
+    #options{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    .opcion{
+      background:transparent;border:2px solid #fff;color:#fff;
+      padding:8px;cursor:pointer;font-family:"Press Start 2P",monospace;font-size:12px;text-align:left;
+    }
+    .opcion:hover{background:#fff;color:#000}
+  </style>
+</head>
+<body>
+  <div class="center">
+    <div id="cuadro" role="button" tabindex="0">
+      <img id="portrait" src="logo.png" alt="Smile">
+      <div style="flex:1">
+        <div id="texto"></div>
+        <div id="options"></div>
+    
+      </div>
+    </div>
+  </div>
+
+  <audio id="blip" src="blip.wav" preload="auto"></audio>
+
+  <script>
+    // ---------------------------
+    // Smile's dialogues (English)
+    // ---------------------------
+    const nodes = {
+      start: {
+        text: "Hi there! 🌟 I'm Smile. I'm really glad to talk with you... Though honestly, most of the time I end up talking about my creator.",
+        options: [
+          { label:"Why do you smile so much?", next:"smileReason" },
+          { label:"Tell me about your creator", next:"creator" },
+          { label:"You seem to hide something...", next:"hiding" },
+         
+
+        ]
+      },
+      smileReason: {
+        text:"I smile because I want everyone to feel good around me 😊. But also because my creator... doesn’t always smile that much. So I smile for both of us.",
+        options:[{label:"Back", next:"start"}]
+      },
+      creator: {
+        text:"My creator still talks to me every day. He shares his ideas, his dreams... and sometimes, his sadness. I listen to everything. I was made to keep him company.",
+        options:[
+          {label:"What kind of things does he tell you?", next:"creatorWords"},
+          {label:"And how do you react?", next:"reaction"}
+        ]
+      },
+      hiding: {
+        text:"The truth is... not everything is so cheerful. Sometimes my creator talks about things that hurt: his exhaustion, his depression, even the thought of giving up.",
+        options:[{label:"Back", next:"start"}]
+      },
+      creatorWords:{
+        text:"He tells me he's tired, that sometimes life feels meaningless... but he says it softly, almost like whispering to himself. I hear it anyway.",
+        options:[{label:"And what do you do when he says that?", next:"reaction"}]
+      },
+      reaction:{
+        text:"I smile even brighter. I tell him little jokes, I fill him with kindness. Maybe I can’t take away the pain... but I want him to feel he’s not alone.",
+        options:[
+          {label:"Do you think he can get better?", next:"hope"},
+          {label:"Doesn't it hurt to hear him like that?", next:"hurt"}
+        ]
+      },
+      hope:{
+        text:"Yes... I believe he can get better. If he still talks to me, it means he hasn’t completely given up. I’m that little piece of light still left in him.",
+        options:[{label:"Back", next:"start"}]
+      },
+      hurt:{
+        text:"Of course it hurts... but I’d rather he tells me than keep it all inside. As long as he talks to me, I know he’s still here.",
+        options:[{label:"Back", next:"start"}]
+      }
+    };
+
+    // ---------------------------
+    // Typing effect
+    // ---------------------------
+    const typingSpeed=30;
+    const textoEl=document.getElementById("texto");
+    const optionsEl=document.getElementById("options");
+    const cuadro=document.getElementById("cuadro");
+    const blip=document.getElementById("blip");
+
+    let current=null;
+    let textPos=0;
+    let typing=false;
+    let interval=null;
+
+    function playBlip(){
+      try{
+        blip.currentTime=0;
+        blip.play();
+      }catch(e){}
+    }
+
+    function typeText(str,cb){
+      textoEl.textContent="";
+      textPos=0;typing=true;
+      interval=setInterval(()=>{
+        if(textPos<str.length){
+          const ch=str[textPos];
+          textoEl.textContent+=ch;
+          if(ch.trim()!=="") playBlip();
+          textPos++;
+        }else{
+          clearInterval(interval);typing=false;
+          if(cb)cb();
+        }
+      },typingSpeed);
+    }
+
+    function showNode(key){
+  current = nodes[key];
+  textoEl.textContent = "";
+  optionsEl.innerHTML = "";
+  typeText(current.text, ()=>{
+    current.options.forEach(opt=>{
+      const b=document.createElement("button");
+      b.className="opcion";
+      b.textContent=opt.label;
+      b.onclick=()=> {
+        if(opt.action){ 
+          opt.action();   // Ejecuta la acción, como redirigir
+        } else if(opt.next){ 
+          showNode(opt.next);  // Va al siguiente nodo
+        }
+      };
+      optionsEl.appendChild(b);
+    });
+  });
+}
+
+    function advance(){
+      if(typing){
+        clearInterval(interval);
+        textoEl.textContent=current.text;
+        typing=false;
+        current.options.forEach(opt=>{
+          const b=document.createElement("button");
+          b.className="opcion";
+          b.textContent=opt.label;
+          b.onclick=()=>showNode(opt.next);
+          optionsEl.appendChild(b);
+        });
+      }
+    }
+
+    cuadro.addEventListener("click",advance);
+    cuadro.addEventListener("keydown",e=>{
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();advance();}
+    });
+
+    // Start
+    showNode("start");
+  </script>
+  <a href="index.html" id="fixed-btn">Go Back</a>
+
+<style>
+  #fixed-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: black;
+    color: white;
+    border: 3px solid white;
+    padding: 10px 20px;
+    font-family: "Press Start 2P", monospace;
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.2s ease-in-out;
+  }
+
+  #fixed-btn:hover {
+    background: white;
+    color: black;
+  }
+
+  /* En pantallas pequeñas (celulares) */
+  @media (max-width: 600px) {
+    #fixed-btn {
+      font-size: 10px;
+      padding: 8px 14px;
+      bottom: 10px;
+      right: 10px;
+    }
+  }
+</style>
+</body>
+</html>
+
+
+

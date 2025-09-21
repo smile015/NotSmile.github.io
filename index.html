@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="utf-8" />
+  <title>Inicio</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    :root {
+      --bg: #000;
+      --fg: #fff;
+      --box-w: 760px;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:"Press Start 2P",monospace}
+    .center{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+
+    /* Dialogue box - Undertale style */
+    #cuadro {
+      width: var(--box-w);
+      background: #000;
+      border: 3px solid #fff;
+      padding: 18px;
+      box-sizing: border-box;
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+      cursor:pointer;
+      border-radius:6px;
+      user-select:none;
+    }
+
+    #portrait {
+      width: 96px;
+      height: 96px;
+      object-fit:contain;
+      image-rendering: pixelated;
+      flex: 0 0 96px;
+    }
+    #texto {
+      flex: 1;
+      font-size: 16px;        /* ajusta si quieres más grande */
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 96px;
+    }
+    #hint { font-size: 10px; opacity:0.7; margin-top:8px }
+
+    /* menu vertical (final) */
+    #menu { display:none; width:320px; border:3px solid #fff; padding:12px; text-align:center; background:#000; margin-left:20px; border-radius:6px }
+    .opcion { display:block; width:100%; margin:8px 0; padding:10px; background:transparent; color:#fff; border:1px solid #fff; cursor:pointer; font-family:"Press Start 2P",monospace; font-size:12px }
+    .opcion:hover, .opcion:focus{ background:#fff; color:#000; outline:none }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <!-- Dialogue box -->
+    <div id="cuadro" role="button" aria-pressed="false" tabindex="0" title="Click or press Enter/Space to advance">
+      <img id="portrait" src="logo.png" alt="portrait" onerror="this.style.display='none'">
+      <div style="flex:1">
+        <div id="texto"></div>
+        <div id="hint"></div>
+      </div>
+    </div>
+
+    <!-- Final menu -->
+    <div id="menu" aria-hidden="true">
+      <button class="opcion" onclick="window.location.href='test.html'">
+  Go to the page
+</button>
+      <button class="opcion" onclick="window.location.href='story.html'">More about Smile</button>
+     
+  </div>
+
+  <script>
+    // ---------------------------
+    // Dialogues (furry, affectionate)
+    // ---------------------------
+    const dialogos = [
+      "Hey there, cutie~! It's so nice to see you here.",
+      "Did you know? Your smile makes the whole screen brighter!",
+      "I just wanted to say... you're absolutely amazing.",
+      "Every click you make feels like a gentle hug to me.",
+      "Mmm... I wish I could hold your paw right now, sweetheart.",
+      "You're not just visiting this page... you're making my heart happy.",
+      "Promise me you'll keep being this wonderful, okay?",
+      "Hehe~ you really are the most adorable human I've ever met.",
+      "Alright, let's move on... but remember, I'll always be here cheering for you!"
+    ];
+
+    // ---------------------------
+    // Config
+    // ---------------------------
+    const typingSpeed = 30; // ms per letter; reduce para más rápido
+    const cuadro = document.getElementById('cuadro');
+    const textoEl = document.getElementById('texto');
+    const menuEl = document.getElementById('menu');
+
+    // Typing state
+    let currentIndex = 0;
+    let currentString = "";
+    let charPos = 0;
+    let typingInterval = null;
+    let isTyping = false;
+
+    // Audio state
+    let audioInited = false;
+    let audioCtx = null;
+    let blipBuffer = null;        // decoded AudioBuffer if blip.wav available
+    let useOscillatorFallback = false;
+
+    // Initialize audio context and try to fetch blip.wav
+    async function initAudio() {
+      if (audioInited) return;
+      audioInited = true;
+
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // resume if suspended (some browsers start suspended)
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+      } catch (e) {
+        console.warn("WebAudio not available:", e);
+        audioCtx = null;
+      }
+
+      if (audioCtx) {
+        // try to fetch and decode blip.wav (if present in same folder)
+        try {
+          const r = await fetch('blip.wav', {cache: "no-cache"});
+          if (!r.ok) throw new Error("fetch failed: " + r.status);
+          const arrayBuffer = await r.arrayBuffer();
+          blipBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+          console.log("blip.wav loaded and decoded.");
+        } catch (err) {
+          console.warn("Could not load/parse blip.wav - using oscillator fallback. Error:", err);
+          blipBuffer = null;
+          useOscillatorFallback = true;
+        }
+      } else {
+        // no WebAudio: we'll still try a short HTMLAudio fallback by creating new Audio() per letter if file exists
+        useOscillatorFallback = false;
+        console.warn("WebAudio not present, falling back to HTMLAudio if possible.");
+      }
+    }
+
+    // Play blip: tries blipBuffer first; else oscillator; else HTMLAudio
+    function playBlip() {
+      try {
+        if (audioCtx && blipBuffer) {
+          const src = audioCtx.createBufferSource();
+          src.buffer = blipBuffer;
+          // slight pitch variation
+          src.playbackRate.value = 0.95 + Math.random() * 0.12;
+          src.connect(audioCtx.destination);
+          src.start();
+        } else if (audioCtx && useOscillatorFallback) {
+          const t0 = audioCtx.currentTime;
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'square';
+          // frequency chosen to be sharp like a blip; slight variation reduces monotony
+          o.frequency.value = 1000 + Math.random() * 300;
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(0.14, t0 + 0.005);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.06);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(t0);
+          o.stop(t0 + 0.08);
+        } else {
+          // As a last resort, try HTMLAudio with a freshly created element (allows overlapping)
+          const a = new Audio('blip.wav');
+          a.volume = 0.8;
+          a.play().catch(()=>{/* autoplay may be blocked but we already attempted initAudio on user gesture */});
+        }
+      } catch (e) {
+        console.warn("Error playing blip:", e);
+      }
+    }
+
+    // Start typing a string letter-by-letter
+    function startTyping(str) {
+      stopTyping();
+      currentString = str;
+      charPos = 0;
+      textoEl.textContent = "";
+      isTyping = true;
+      typingInterval = setInterval(() => {
+        if (charPos < currentString.length) {
+          const ch = currentString[charPos];
+          textoEl.textContent += ch;
+          // play blip for non-space characters (you can refine: skip punctuation if desired)
+          if (ch.trim() !== '') {
+            playBlip();
+          }
+          charPos++;
+        } else {
+          stopTyping();
+        }
+      }, typingSpeed);
+    }
+
+    function stopTyping() {
+      if (typingInterval) {
+        clearInterval(typingInterval);
+        typingInterval = null;
+      }
+      isTyping = false;
+    }
+
+    // Advance: if typing -> show full; else go to next dialog
+    async function advance() {
+      // ensure audio initialized on first user action
+      await initAudio();
+
+      if (isTyping) {
+        // reveal full text immediately
+        stopTyping();
+        textoEl.textContent = currentString;
+        return;
+      }
+
+      // next dialog
+      currentIndex++;
+      if (currentIndex < dialogos.length) {
+        startTyping(dialogos[currentIndex]);
+      } else {
+        // finished all dialogs => show menu
+        document.getElementById('cuadro').style.display = 'none';
+        menuEl.style.display = 'block';
+        menuEl.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    // event listeners: click + keyboard
+    cuadro.addEventListener('click', (e) => {
+      e.preventDefault();
+      advance();
+    });
+    cuadro.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        advance();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      // allow Enter/Space globally if cuadro visible
+      if (document.getElementById('cuadro').style.display !== 'none') {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          advance();
+        }
+      }
+    });
+
+    // Start first dialog
+    startTyping(dialogos[currentIndex]);
+
+    // Helpful console message
+    console.log("Dialogue ready. Place 'portrait.png' and optional 'blip.wav' in same folder as index.html. Click the box once to enable audio.");
+  </script>
+</body>
+</html>
+
+
+
