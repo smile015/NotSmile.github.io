@@ -111,9 +111,22 @@
   </style>
 </head>
 <body>
-  <audio autoplay loop hidden>
+ <audio id="bgm" autoplay loop muted>
   <source src="bgm.mp3" type="audio/mpeg">
 </audio>
+
+<button id="playMusic">🎵 Activar música</button>
+
+<script>
+  const bgm = document.getElementById("bgm");
+  const btn = document.getElementById("playMusic");
+
+  btn.addEventListener("click", () => {
+    bgm.muted = false;
+    bgm.play();
+    btn.style.display = "none"; // ocultar botón después
+  });
+</script>
 
   
   <header>
@@ -232,6 +245,7 @@
 </style>
 </body>
 </html>
+
 
 
 
