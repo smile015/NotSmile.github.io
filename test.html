@@ -119,14 +119,19 @@
 
 <script>
   const bgm = document.getElementById("bgm");
-  const btn = document.getElementById("playMusic");
+  const btn = document.getElementById("musicBtn");
 
   btn.addEventListener("click", () => {
-    bgm.muted = false;
-    bgm.play();
-    btn.style.display = "none"; // ocultar botón después
+    if (bgm.paused) {
+      bgm.play();
+      btn.textContent = "⏸️ Pausar Música";
+    } else {
+      bgm.pause();
+      btn.textContent = "▶️ Reanudar Música";
+    }
   });
 </script>
+
 
   
   <header>
@@ -245,6 +250,7 @@
 </style>
 </body>
 </html>
+
 
 
 
