@@ -201,12 +201,24 @@
     <p>Agradecemos sinceramente a todas las personas que visitaron esta página, apoyaron el proyecto y creyeron en el poder de la creatividad y el emprendimiento. 💖</p>
   </section>
 
-  <script>
-    function showPage(id) {
-      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
+ <script>
+  const bgm = document.getElementById("bgm");
+  const toggleBtn = document.getElementById("musicToggle");
+  let musicOn = false;
+
+  toggleBtn.addEventListener("click", () => {
+    if (musicOn) {
+      bgm.pause();
+      toggleBtn.textContent = "🎵 Activar Música";
+      musicOn = false;
+    } else {
+      bgm.play();
+      toggleBtn.textContent = "🔇 Desactivar Música";
+      musicOn = true;
     }
-  </script>
+  });
+</script>
+
   <a href="index.html" id="fixed-btn">volver</a>
 
 <style>
@@ -240,27 +252,12 @@
       right: 10px;
     }
   }
-  <script>
-  const bgm = document.getElementById("bgm");
-  const toggleBtn = document.getElementById("musicToggle");
-  let musicOn = false;
-
-  toggleBtn.addEventListener("click", () => {
-    if (musicOn) {
-      bgm.pause();
-      toggleBtn.textContent = "🎵 Activar Música";
-      musicOn = false;
-    } else {
-      bgm.play();
-      toggleBtn.textContent = "🔇 Desactivar Música";
-      musicOn = true;
-    }
-  });
-</script>
+  
 
 </style>
 </body>
 </html>
+
 
 
 
