@@ -63,20 +63,26 @@
       color: white;
     }
 
-    button {
-      background: black;
-      color: white;
-      border: 2px solid white;
-      padding: 8px 16px;
-      font-family: 'Press Start 2P', monospace;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    #musicToggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: black;
+  color: white;
+  border: 2px solid white;
+  padding: 8px 16px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.2s;
+}
 
-    button:hover {
-      background: white;
-      color: black;
-    }
+#musicToggle:hover {
+  background: white;
+  color: black;
+}
+
 
     /* Botón fijo en esquina */
     #fixed-btn {
@@ -111,26 +117,13 @@
   </style>
 </head>
 <body>
- <audio id="bgm" autoplay loop muted>
+ <audio id="bgm" loop>
   <source src="bgm.mp3" type="audio/mpeg">
 </audio>
 
-<button id="playMusic">🎵 Activar música</button>
+<button id="musicToggle">🎵 Activar Música</button>
 
-<script>
-  const bgm = document.getElementById("bgm");
-  const btn = document.getElementById("musicBtn");
 
-  btn.addEventListener("click", () => {
-    if (bgm.paused) {
-      bgm.play();
-      btn.textContent = "⏸️ Pausar Música";
-    } else {
-      bgm.pause();
-      btn.textContent = "▶️ Reanudar Música";
-    }
-  });
-</script>
 
 
   
@@ -247,9 +240,28 @@
       right: 10px;
     }
   }
+  <script>
+  const bgm = document.getElementById("bgm");
+  const toggleBtn = document.getElementById("musicToggle");
+  let musicOn = false;
+
+  toggleBtn.addEventListener("click", () => {
+    if (musicOn) {
+      bgm.pause();
+      toggleBtn.textContent = "🎵 Activar Música";
+      musicOn = false;
+    } else {
+      bgm.play();
+      toggleBtn.textContent = "🔇 Desactivar Música";
+      musicOn = true;
+    }
+  });
+</script>
+
 </style>
 </body>
 </html>
+
 
 
 
