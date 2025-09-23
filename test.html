@@ -63,26 +63,20 @@
       color: white;
     }
 
-    #musicToggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: black;
-  color: white;
-  border: 2px solid white;
-  padding: 8px 16px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 12px;
-  cursor: pointer;
-  z-index: 1000;
-  transition: all 0.2s;
-}
+    button {
+      background: black;
+      color: white;
+      border: 2px solid white;
+      padding: 8px 16px;
+      font-family: 'Press Start 2P', monospace;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-#musicToggle:hover {
-  background: white;
-  color: black;
-}
-
+    button:hover {
+      background: white;
+      color: black;
+    }
 
     /* Botón fijo en esquina */
     #fixed-btn {
@@ -116,6 +110,7 @@
     }
   </style>
 </head>
+
 <body>
  <audio id="bgm" loop>
   <source src="bgm.mp3" type="audio/mpeg">
