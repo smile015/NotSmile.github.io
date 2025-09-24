@@ -137,7 +137,7 @@
   <source src="bgm.mp3" type="audio/mpeg">
 </audio>
 
-<button id="musicToggle">🎵 Activar Música</button> 
+
   <header>
     <h1>Feria de Emprendimiento 2025</h1>
     <nav>
@@ -212,30 +212,7 @@
     <p>Agradecemos sinceramente a todas las personas que visitaron esta página, apoyaron el proyecto y creyeron en el poder de la creatividad y el emprendimiento. 💖</p>
   </section>
 
- <script>
-    
-  const bgm = document.getElementById("bgm");
-  const toggleBtn = document.getElementById("musicToggle");
-  let musicOn = false;
 
-  toggleBtn.addEventListener("click", () => {
-    if (musicOn) {
-      bgm.pause();
-      toggleBtn.textContent = "🎵 Activar Música";
-      musicOn = false;
-    } else {
-      bgm.play();
-      toggleBtn.textContent = "🔇 Desactivar Música";
-      musicOn = true;
-    }
-  });
-
-
-    function showPage(id) {
-      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
-    }
-  </script>
 
   <a href="index.html" id="fixed-btn">volver</a>
 
@@ -273,8 +250,39 @@
   
 
 </style>
+  <button id="musicToggle">🎵 Activar Música</button> 
+
+<!-- … tus secciones aquí … -->
+
+<script>
+  const bgm = document.getElementById("bgm");
+  const toggleBtn = document.getElementById("musicToggle");
+  let musicOn = false;
+
+  toggleBtn.addEventListener("click", () => {
+    if (musicOn) {
+      bgm.pause();
+      toggleBtn.textContent = "🎵 Activar Música";
+      musicOn = false;
+    } else {
+      bgm.play().then(() => {
+        toggleBtn.textContent = "🔇 Desactivar Música";
+        musicOn = true;
+      }).catch(err => {
+        console.log("Reproducción bloqueada:", err);
+      });
+    }
+  });
+
+  function showPage(id) {
+    document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+</script>
+
 </body>
 </html>
+
 
 
 
