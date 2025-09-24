@@ -136,19 +136,20 @@
   background: white;
   color: black;
 }
-.titulo-con-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px; /* separación entre logo y texto */
-  margin-bottom: 20px;
+.logo-esquina {
+  position: fixed;        /* siempre visible aunque hagas scroll */
+  bottom: 10px;           /* separación desde abajo */
+  right: 10px;            /* separación desde la derecha */
+  width: 60px;            /* tamaño pequeño */
+  border: 2px solid white;
+  padding: 3px;
+  background: black;
+  opacity: 0.8;           /* un poco transparente */
+  z-index: 2000;          /* encima del contenido */
 }
 
-.logo-colegio {
-  max-width: 100px;   /* tamaño más discreto */
-  border: 2px solid white;
-  padding: 5px;
-  background: black;
+.logo-esquina:hover {
+  opacity: 1;             /* resalta cuando pasas el mouse */
 }
 
 
@@ -308,6 +309,7 @@ toggleBtn.addEventListener("click", () => {
 
 </body>
 </html>
+
 
 
 
