@@ -136,22 +136,18 @@
   background: white;
   color: black;
 }
-.logo-esquina {
-  position: fixed;        /* siempre visible aunque hagas scroll */
-  bottom: 10px;           /* separación desde abajo */
-  right: 10px;            /* separación desde la derecha */
-  width: 60px;            /* tamaño pequeño */
-  border: 2px solid white;
-  padding: 3px;
+.logo-esquina-seccion {
+  position: absolute;   /* se coloca dentro de la caja de la sección */
+  top: 10px;            /* separación desde arriba */
+  right: 10px;          /* separación desde la derecha */
+  width: 100px;         /* tamaño del logo */
+  border: 3px solid white; /* marco undertale */
+  padding: 4px;
   background: black;
-  opacity: 0.8;           /* un poco transparente */
-  z-index: 2000;          /* encima del contenido */
 }
-
-.logo-esquina:hover {
-  opacity: 1;             /* resalta cuando pasas el mouse */
+section {
+  position: relative; /* importante para que el logo se quede dentro */
 }
-
 
   </style>
 </head>
@@ -188,6 +184,7 @@
       <li>Promover el trabajo en equipo y la colaboración.</li>
       <li>Fortalecer las habilidades emprendedoras en proyectos reales.</li>
     </ul>
+    <img src="CCC.PNG" alt="Logo Colegio Ciudad del Campo" class="logo-esquina-seccion">
   </section>
 
   <section id="mision">
@@ -306,10 +303,11 @@ toggleBtn.addEventListener("click", () => {
     document.getElementById(id).classList.add("active");
   }
 </script>
-<img src="CCC.PNG" alt="Logo Colegio Ciudad del Campo" class="logo-esquina">
+
 
 </body>
 </html>
+
 
 
 
