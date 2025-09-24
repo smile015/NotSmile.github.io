@@ -108,24 +108,31 @@
         right: 10px;
       }
     }
-  #musicToggle {
+ #musicToggle {
   position: fixed;
-  top: 15px;          /* distancia desde arriba */
-  left: 50%;          /* centrado horizontal */
-  transform: translateX(-50%); /* corrige el centrado */
-  width: 40px;        /* más pequeño */
-  height: 40px;
-  border-radius: 50%; /* botón circular */
-  background: black;
-  color: white;
-  border: 2px solid white;
-  font-size: 18px;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
   cursor: pointer;
   z-index: 3000;
+}
+
+#musicToggle span {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 2px solid white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 38px;
+  font-size: 20px;
+  color: white;
+  background: black;
   transition: all 0.2s;
 }
 
-#musicToggle:hover {
+#musicToggle span:hover {
   background: white;
   color: black;
 }
@@ -251,29 +258,31 @@
   
 
 </style>
-  <button id="musicToggle">🎵 Activar Música</button> 
+  <button id="musicToggle">
+  <span>🎵</span>
+</button>
+
 
 <!-- … tus secciones aquí … -->
 
 <script>
-  const bgm = document.getElementById("bgm");
-  const toggleBtn = document.getElementById("musicToggle");
-  let musicOn = false;
+ const bgm = document.getElementById("bgm");
+const toggleBtn = document.getElementById("musicToggle");
+const icon = toggleBtn.querySelector("span");
+let musicOn = false;
 
-  toggleBtn.addEventListener("click", () => {
-    if (musicOn) {
-      bgm.pause();
-      toggleBtn.textContent = "🎵 Activar Música";
-      musicOn = false;
-    } else {
-      bgm.play().then(() => {
-        toggleBtn.textContent = "🔇 Desactivar Música";
-        musicOn = true;
-      }).catch(err => {
-        console.log("Reproducción bloqueada:", err);
-      });
-    }
-  });
+toggleBtn.addEventListener("click", () => {
+  if (musicOn) {
+    bgm.pause();
+    icon.textContent = "🎵"; // mostrar activar
+    musicOn = false;
+  } else {
+    bgm.play();
+    icon.textContent = "🔇"; // mostrar desactivar
+    musicOn = true;
+  }
+});
+
 
   function showPage(id) {
     document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
@@ -283,6 +292,7 @@
 
 </body>
 </html>
+
 
 
 
