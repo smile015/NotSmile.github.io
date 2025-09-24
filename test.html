@@ -136,12 +136,7 @@
   <source src="bgm.mp3" type="audio/mpeg">
 </audio>
 
-<button id="musicToggle">🎵 Activar Música</button>
-
-
-
-
-  
+<button id="musicToggle">🎵 Activar Música</button> 
   <header>
     <h1>Feria de Emprendimiento 2025</h1>
     <nav>
@@ -217,6 +212,7 @@
   </section>
 
  <script>
+    
   const bgm = document.getElementById("bgm");
   const toggleBtn = document.getElementById("musicToggle");
   let musicOn = false;
@@ -232,7 +228,13 @@
       musicOn = true;
     }
   });
-</script>
+
+
+    function showPage(id) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+  </script>
 
   <a href="index.html" id="fixed-btn">volver</a>
 
@@ -272,6 +274,7 @@
 </style>
 </body>
 </html>
+
 
 
 
