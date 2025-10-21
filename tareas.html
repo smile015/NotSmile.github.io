@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Smile Task Manager — Demo (Payment Simulation)</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000; --fg:#fff; --muted:rgba(255,255,255,0.75);
+    --accent:#00d1ff; --high:#ff6b6b; --med:#ffd166; --low:#7bed9f;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:'Press Start 2P',monospace}
+  header{border-bottom:2px solid var(--fg);padding:14px 16px;position:relative}
+  h1{margin:0;font-size:18px}
+  #timerContainer{display:inline-block;margin-top:10px;padding:8px 14px;border:2px solid var(--fg);background:var(--bg);box-shadow:0 0 8px var(--fg);font-size:12px}
+  #notifyBtn{position:absolute;right:16px;top:12px;background:var(--bg);border:2px solid var(--fg);color:var(--fg);padding:6px 10px;cursor:pointer}
+  #notifyBtn:hover{background:var(--fg);color:#000}
+  main{max-width:1100px;margin:18px auto;padding:12px;box-sizing:border-box}
+  .layout{display:flex;gap:20px;align-items:flex-start;justify-content:center}
+  @media(max-width:980px){ .layout{flex-direction:column;align-items:center} #statusBox,#tasksBox{width:90%}}
+  #statusBox,#tasksBox{border:2px solid var(--fg);background:var(--bg);padding:20px;width:42%;min-height:420px;box-sizing:border-box}
+  #statusBox{display:flex;flex-direction:column;align-items:center;justify-content:center}
+  #statusBox img{width:110px;height:110px;image-rendering:pixelated;border:2px solid var(--fg);padding:4px;background:var(--bg)}
+  .task-form input,.task-form select{width:100%;box-sizing:border-box;padding:8px;margin-bottom:8px;background:var(--bg);color:var(--fg);border:2px solid var(--fg);font-family:inherit}
+  .task-row{display:flex;gap:8px}
+  .task-row .small{flex:0 0 160px}
+  .btn{background:transparent;border:2px solid var(--fg);color:var(--fg);padding:8px 10px;cursor:pointer;font-family:inherit}
+  .btn:hover{background:var(--fg);color:#000}
+  .tasks-list{margin-top:12px;list-style:none;padding:0}
+  .task{display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px dashed var(--muted);gap:8px}
+  .task .meta{font-size:11px;color:var(--muted)}
+  .task-actions button{margin-left:6px;padding:6px 8px;font-size:10px}
+  .progress-wrap{margin-top:12px}
+  progress{width:100%;height:14px}
+  .no-tasks{color:var(--muted);font-size:12px;text-align:center;padding:12px}
+  /* Video overlay */
+  #videoOverlay{display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center}
+  #videoOverlay video{width:80%;border:3px solid var(--fg);background:#000}
+  /* Payment modal */
+  #paymentModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center}
+  .pay-box{width:92%;max-width:520px;border:3px solid var(--fg);padding:18px;background:var(--bg);box-sizing:border-box;text-align:left}
+  .pay-box h2{margin:0 0 8px 0;font-size:14px}
+  .price{font-size:20px;margin:8px 0}
+  .pay-methods{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .pay-method{flex:1;border:2px solid var(--fg);padding:10px;text-align:center;cursor:pointer}
+  .pay-method:hover{background:var(--fg);color:#000}
+  .small{font-size:11px;color:var(--muted)}
+  .center{text-align:center}
+  /* spinner */
+  .spinner{width:28px;height:28px;border:4px solid rgba(255,255,255,0.08);border-top-color:var(--fg);border-radius:50%;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* notice */
+  .notice{margin-top:12px;padding:8px;border:2px dashed var(--muted);color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+  <!-- Payment modal (simulated) -->
+  <div id="paymentModal" role="dialog" aria-modal="true">
+    <div class="pay-box">
+      <h2>Access Payment — Demo (simulation)</h2>
+      <p class="small">To access the Smile Task Manager for this demo you must "pay" <strong>2,000 COP</strong>. This is a <strong>simulation</strong> for presentation purposes — no real money will be charged.</p>
+      <div class="center price">PRICE: <strong>2,000 COP</strong></div>
+
+      <div style="margin-top:8px"><strong>Select payment method</strong></div>
+      <div class="pay-methods" role="list">
+        <div class="pay-method" id="payPayPal" role="button">Pay with PayPal (simulate)</div>
+        <div class="pay-method" id="payNequi" role="button">Pay with Nequi (simulate)</div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn" id="simulateFail">Simulate Failure</button>
+        <button class="btn" id="resetPayment">Reset Payment</button>
+      </div>
+
+      <div class="notice">
+        <strong>Note:</strong> This modal only simulates a payment flow for your fair/demo. To accept real payments you must integrate official PayPal/Nequi SDKs and handle secure server-side processing.
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <h1>Smile Task Manager</h1>
+    <div id="timerContainer">⏱ <span id="timerDisplay">06:07</span></div>
+    <button id="notifyBtn" class="btn" onclick="enableNotifications()">🔔 Enable Notifications</button>
+  </header>
+
+  <main class="main">
+    <div class="layout">
+      <!-- Smile box -->
+      <div id="statusBox">
+        <img src="logo.png" alt="Smile avatar">
+        <div id="smileText" style="margin-top:12px;line-height:1.4;text-align:center">Keep it up!</div>
+      </div>
+
+      <!-- Tasks box -->
+      <div id="tasksBox">
+        <div class="task-form">
+          <input id="titleInput" type="text" placeholder="Task title...">
+          <div class="task-row" style="margin-bottom:8px">
+            <input id="dateInput" type="date" class="small">
+            <select id="priorityInput" class="small">
+              <option value="High">High Priority</option>
+              <option value="Medium">Medium Priority</option>
+              <option value="Low">Low Priority</option>
+            </select>
+            <button id="addBtn" class="btn">Add Task</button>
+          </div>
+        </div>
+
+        <div style="margin-top:10px">
+          <div class="progress-wrap">
+            <div id="progressText" style="font-size:11px;margin-bottom:6px">Progress: 0%</div>
+            <progress id="progressFill" value="0" max="100"></progress>
+          </div>
+          <ul id="taskList" class="tasks-list"></ul>
+          <div id="noTasks" class="no-tasks">No tasks yet. Add one to get started!</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Video overlay -->
+  <div id="videoOverlay">
+    <video id="memeVideo" controls preload="auto">
+      <source src="67.mp4" type="video/mp4">
+      Your browser does not support video.
+    </video>
+  </div>
+
+<script>
+/* ---------------------------
+   Payment simulation
+   --------------------------- */
+const PAYMENT_KEY = 'smile_paid_demo_v1';
+const paymentModal = document.getElementById('paymentModal');
+const payPayPalBtn = document.getElementById('payPayPal');
+const payNequiBtn = document.getElementById('payNequi');
+const simulateFail = document.getElementById('simulateFail');
+const resetPaymentBtn = document.getElementById('resetPayment');
+
+function showPaymentModal(){
+  paymentModal.style.display = 'flex';
+}
+
+function hidePaymentModal(){
+  paymentModal.style.display = 'none';
+}
+
+function markAsPaid(){
+  localStorage.setItem(PAYMENT_KEY,'1');
+  hidePaymentModal();
+  typeSmile("Payment confirmed. Welcome!");
+}
+
+// simulate processing with spinner and delay
+function simulateProcessing(success=true){
+  const box = document.querySelector('.pay-box');
+  const old = box.innerHTML;
+  box.innerHTML = `<div style="text-align:center"><div class="spinner"></div><div style="margin-top:10px">Processing...</div></div>`;
+  setTimeout(()=>{
+    box.innerHTML = old; // restore UI
+    if (success) markAsPaid();
+    else {
+      alert('Payment failed (simulated). Try again.');
+    }
+  }, 1500 + Math.random()*1500);
+}
+
+payPayPalBtn.addEventListener('click', ()=> simulateProcessing(true));
+payNequiBtn.addEventListener('click', ()=> simulateProcessing(true));
+simulateFail.addEventListener('click', ()=> simulateProcessing(false));
+resetPaymentBtn.addEventListener('click', ()=> { localStorage.removeItem(PAYMENT_KEY); alert('Payment reset (demo).'); showPaymentModal(); });
+
+/* If not paid, show modal on load */
+if (!localStorage.getItem(PAYMENT_KEY)) {
+  // show after short delay so layout loads
+  setTimeout(showPaymentModal, 250);
+}
+
+/* ---------------------------
+   Timer & video
+   --------------------------- */
+let countdown = 367;
+const timerDisplay = document.getElementById('timerDisplay');
+const overlay = document.getElementById('videoOverlay');
+const memeVideo = document.getElementById('memeVideo');
+let timerInterval = null;
+
+function formatTime(sec){
+  const m = String(Math.floor(sec/60)).padStart(2,'0');
+  const s = String(sec%60).padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+function updateTimer(){
+  timerDisplay.textContent = formatTime(countdown);
+  countdown--;
+  if (countdown < 0){
+    clearInterval(timerInterval);
+    // show video only if paid (simulation)
+    if (localStorage.getItem(PAYMENT_KEY)) showVideo();
+    else {
+      // if not paid, keep looping without showing video
+      countdown = 367;
+      timerInterval = setInterval(updateTimer,1000);
+    }
+  }
+}
+
+function restartTimer(){
+  countdown = 367;
+  timerDisplay.textContent = formatTime(countdown);
+  timerInterval = setInterval(updateTimer,1000);
+}
+
+function showVideo(){
+  overlay.style.display = 'flex';
+  try{ memeVideo.currentTime = 0; memeVideo.play(); }catch(e){}
+  memeVideo.onended = ()=> {
+    overlay.style.display = 'none';
+    restartTimer();
+  };
+}
+
+timerInterval = setInterval(updateTimer,1000);
+
+/* ---------------------------
+   Task manager (local only)
+   --------------------------- */
+const titleInput = document.getElementById('titleInput');
+const dateInput = document.getElementById('dateInput');
+const priorityInput = document.getElementById('priorityInput');
+const addBtn = document.getElementById('addBtn');
+const taskList = document.getElementById('taskList');
+const noTasks = document.getElementById('noTasks');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+const smileText = document.getElementById('smileText');
+
+let tasks = JSON.parse(localStorage.getItem('smile_tasks_v2') || '[]');
+
+function saveTasks(){ localStorage.setItem('smile_tasks_v2', JSON.stringify(tasks)); }
+
+function renderTasks(){
+  taskList.innerHTML = '';
+  if (tasks.length === 0) noTasks.style.display = 'block'; else noTasks.style.display = 'none';
+
+  let done = 0;
+  tasks.forEach((t, idx) => {
+    const li = document.createElement('li');
+    li.className = 'task';
+    const left = document.createElement('div');
+    left.style.flex='1';
+    left.innerHTML = `<strong style="font-size:12px">${escapeHtml(t.title)}</strong><div class="meta">${t.date || 'No date'} • ${t.priority}</div>`;
+    const actions = document.createElement('div');
+    actions.className = 'task-actions';
+    const completeBtn = document.createElement('button');
+    completeBtn.className='btn';
+    completeBtn.textContent = t.done ? 'Undo' : 'Complete';
+    completeBtn.onclick = ()=> { t.done = !t.done; saveTasks(); renderTasks(); typeSmile(pick(smilePhrases)); };
+    const delBtn = document.createElement('button');
+    delBtn.className='btn';
+    delBtn.textContent = 'Delete';
+    delBtn.onclick = ()=> { tasks.splice(idx,1); saveTasks(); renderTasks(); typeSmile('Task removed.'); };
+    actions.appendChild(completeBtn); actions.appendChild(delBtn);
+
+    if (t.done) done++;
+    if (t.done) left.querySelector('strong').style.textDecoration = 'line-through';
+
+    li.appendChild(left); li.appendChild(actions);
+    taskList.appendChild(li);
+  });
+
+  const pct = tasks.length ? Math.round(done/tasks.length*100) : 0;
+  progressFill.value = pct;
+  progressText.textContent = `Progress: ${pct}% (${done}/${tasks.length})`;
+}
+
+addBtn.addEventListener('click', ()=>{
+  const title = titleInput.value.trim();
+  if (!title){ typeSmile('Please enter a task title.'); return; }
+  const date = dateInput.value || '';
+  const priority = priorityInput.value;
+  tasks.push({title,date,priority,done:false});
+  saveTasks(); renderTasks();
+  titleInput.value=''; dateInput.value=''; priorityInput.selectedIndex=1;
+  typeSmile(pick(smilePhrases));
+});
+
+/* ---------------------------
+   Smile typing + phrases
+   --------------------------- */
+const smilePhrases = [
+  "Good job!",
+  "You're doing great!",
+  "I'm proud of you!",
+  "Keep it up!"
+];
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+const blipAudio = new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg');
+function typeSmile(text){
+  const el = document.getElementById('smileText');
+  el.textContent = '';
+  let i = 0;
+  function step(){
+    if (i < text.length){
+      const ch = text.charAt(i);
+      el.textContent += ch;
+      if (ch.trim() !== '') { try{ blipAudio.currentTime = 0; blipAudio.play(); }catch(e){} }
+      i++; setTimeout(step,36);
+    }
+  }
+  step();
+}
+
+/* ---------------------------
+   Notifications (12 hours) - enabled manually
+   --------------------------- */
+const notifPhrases = [
+  "Smile says: Don't forget to check your tasks!",
+  "Time to get things done!",
+  "Remember to stay focused!",
+  "Take a moment to review your upcoming deadlines."
+];
+
+function enableNotifications(){
+  if (!('Notification' in window)){ alert('Notifications not supported'); return; }
+  Notification.requestPermission().then(perm=>{
+    if (perm === 'granted'){
+      typeSmile('Notifications enabled. I will remind you every 12 hours.');
+      // send one immediately and schedule
+      sendNotification();
+      // store interval id in window to allow clearing later if needed
+      if (!window.smileNotifInterval){ window.smileNotifInterval = setInterval(sendNotification, 43200000); } // 12h
+    } else {
+      typeSmile('Notifications blocked.');
+    }
+  });
+}
+
+function sendNotification(){
+  if (Notification.permission !== 'granted') return;
+  const body = pick(notifPhrases);
+  try{ new Notification('Smile Reminder', { body, icon: 'https://i.ibb.co/Lpkc1TS/fur-icon.png' }); }catch(e){}
+}
+
+/* ---------------------------
+   Init
+   --------------------------- */
+(function init(){
+  // If not paid, we already show modal on load (above)
+  renderTasks();
+  renderAchievementsIfAny(); // placeholder - keep compatibility
+  // greet
+  setTimeout(()=> typeSmile("Hello! I'm Smile, your helper."), 400);
+})();
+
+function renderAchievementsIfAny(){ /* no achievements UI in this layout; kept for safety */ }
+
+/* ---------------------------
+   Utilities
+   --------------------------- */
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+</script>
+ <a href="index.html" id="fixed-btn">volver</a>
+
+<style>
+  #fixed-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: black;
+    color: white;
+    border: 3px solid white;
+    padding: 10px 20px;
+    font-family: "Press Start 2P", monospace;
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.2s ease-in-out;
+  }
+
+  #fixed-btn:hover {
+    background: white;
+    color: black;
+  }
+
+  /* En pantallas pequeñas (celulares) */
+  @media (max-width: 600px) {
+    #fixed-btn {
+      font-size: 10px;
+      padding: 8px 14px;
+      bottom: 10px;
+      right: 10px;
+    }
+  }
+</style>
+</body>
+</html>
+
+
