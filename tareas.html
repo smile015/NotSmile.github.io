@@ -347,9 +347,6 @@ function typeSmile(text){
   step();
 }
 
-/* ---------------------------
-   Notifications (12 hours) - enabled manually
-   --------------------------- */
 const notifPhrases = [
   "Smile says: Don't forget to check your tasks!",
   "Time to get things done!",
@@ -375,7 +372,7 @@ function enableNotifications(){
 function sendNotification(){
   if (Notification.permission !== 'granted') return;
   const body = pick(notifPhrases);
-  try{ new Notification('Smile Reminder', { body, icon: 'https://i.ibb.co/Lpkc1TS/fur-icon.png' }); }catch(e){}
+  try{ new Notification('Smile Reminder', { body, icon: 'logo.png' }); }catch(e){}
 }
 
 /* ---------------------------
@@ -395,6 +392,47 @@ function renderAchievementsIfAny(){ /* no achievements UI in this layout; kept f
    Utilities
    --------------------------- */
 function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+  /* 🔔 NOTIFICACIONES CADA 12 HORAS */
+async function requestNotificationPermission() {
+  if (!("Notification" in window)) {
+    console.log("Tu navegador no soporta notificaciones.");
+    return;
+  }
+  const permission = await Notification.requestPermission();
+  if (permission === "granted") {
+    console.log("Notificaciones activadas.");
+  } else {
+    console.log("Permiso de notificaciones denegado.");
+  }
+}
+
+function showNotification() {
+  const options = {
+    body: "Remember to check your tasks, you’re doing great! 💙",
+    icon: "logo.png", // o cualquier otra imagen que tengas
+    badge: "logo.png",
+  };
+  new Notification("Smile Task Manager", options);
+}
+
+// Pide permiso al cargar
+requestNotificationPermission();
+
+// Programa notificación cada 12 horas
+const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+setInterval(() => {
+  if (Notification.permission === "granted") {
+    showNotification();
+  }
+}, TWELVE_HOURS);
+
+// También una de prueba a los 5 segundos (puedes quitarla)
+setTimeout(() => {
+  if (Notification.permission === "granted") {
+    showNotification();
+  }
+}, 5000);
+
 </script>
  <a href="index.html" id="fixed-btn">volver</a>
 
@@ -432,6 +470,7 @@ function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&am
 </style>
 </body>
 </html>
+
 
 
 
