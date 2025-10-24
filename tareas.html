@@ -55,112 +55,6 @@
 </style>
 </head>
 <body>
-  <!-- 🔐 PIN ACCESS SYSTEM (Undertale style) -->
-<div id="pinScreen" style="
-  position: fixed; inset: 0;
-  background: black;
-  color: white;
-  font-family: 'Press Start 2P', monospace;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  text-align: center;
-">
-  <h2 style="font-size: 14px;">ACCESS REQUIRED</h2>
-  <p style="font-size: 10px;">Enter your 6-digit PIN</p>
-  <input id="pinInput" type="password" maxlength="6"
-    style="background:black;border:2px solid white;color:white;
-    padding:6px;text-align:center;font-family:'Press Start 2P',monospace;">
-  <button id="verifyPin" style="
-    margin-top:10px;background:black;color:white;
-    border:2px solid white;padding:6px 14px;
-    font-family:'Press Start 2P',monospace;cursor:pointer;">OK</button>
-  <p id="pinMsg" style="font-size:10px;color:#ccc;margin-top:10px;"></p>
-</div>
-
-<script>
-// --- PIN ACCESS CONTROL ---
-const AUTH_KEY = "smile_pin_ok";
-const USED_PINS_KEY = "used_pins_list";
-const STORED_HASHES = [
-  "6221454d3ae9dc0218ee729f486c23ff4a3e174f2abd47360766dddfeaca1682",
-  "c0f53cb9c082c687da233dc62da43be32801dd3d9cf2d18335834b54b0cd3f89",
-  "1e13e07b8484e730997fbe516f1e0adf94729dbb30c2e92dfbdb9839c6e4e434",
-  "be11e4041db29c41f1ef4b2a83747a9876e7d4f9b62e5235696385e43f647c2f",
-  "3a0612426eb65e00bedc3a710151c53024b0d5077823a4f2a684a2723dd14174",
-  "29ce52a7665088dce617f603c37414ced582639b935e0c283662a07c45ebb733",
-  "8a407c914628a873a1c6fbf03830e9a0b5337972885be90899cf41458de192f8",
-  "14b7b7e3baec54ee94dc85af8da927f0d7a2177bb683e752ebc106a56b5d6de4",
-  "c06970b069987b0424d5c61476a566aa52f19077fa1bb133ca5572b0e086f38e",
-  "4b7478a8ecf570ec213c9f2ba7248671025ca4cf507a025ce40e046a21b38c4d",
-  "3d0eb4d649154304dbf910a477076085edeb6a42b49dc535e20abe583ee4701e",
-  "f783f5739e82fc3febc430175d842a6bedded4446a271081ee28ba96ef1778bd",
-  "9c652ad75b4e3a2c1f1619fdbf084709223bb0c24bb6eb642518a63d54939035",
-  "62ca4a15c50638e44b48b630a31dc0ca0d25b12fe15871b6507b938a9ce5e56d",
-  "3b8a2bc00b1d1cbdf8decdf1400913affe91e56a48bb091705ce04c295ff5ebc",
-  "eed8d091319a1c7cfbb4195a07f59e87771a20fd2ae371087c762dc00455742e",
-  "c2501731caa33b92f24106eaa37de28edc7d4e1548e9fab463cd8e0e4c8c0771",
-  "46760ee4030b8663a5c92604711bba26afa00136aa11b07d97617d91ecd58081",
-  "3d5e554a8268b0baf4ff9d81eb9b77d81e3c3834350caca50c3833da49c6134e",
-  "f34534b36ae4cb11cd7b8befae3a1acf6e766a78295f2a1c9eef7b3256ea5e8c",
-  "583941e9ea1fd6d103b91587413c872daa05a2a0d5312f15a6a607a0b68847a7",
-  "2ad562e66423f2618eb02316d328342f87f6bf4f26b10d59c6b854c49ddc305c",
-  "f9c8f624b542e7f324c95dc080f90b6f572eb72d6667b85113f43cf51ec044a4",
-  "0431bacf9fc018a05ff568972caab847af3326a54e572c8ae14dc5d17214c1ed",
-  "138e00a0a1b0846a2aa337e0fad042d2b168176184d8cfbfafa0849bdd95c068",
-  "ce0b5e444993bce62439a78fe31202c5b7b93f38dde2786b8ee2366a9e1726ac",
-  "6c1c9509c6c1849d835aece75a3836a99f5795e3392f45232421e0f1ad36235d",
-  "8cb96cb14f8abe90d9d73e6d01418337434afb7935b9acac09ea2ded38ca3714",
-  "db2042979f4883085f86d94db833965ef8ca303d139d8eaeb485590c976440d6",
-  "05853cc8379476d8bb3d350625a3bc08b91214049be1847d4e5403cc44715e31"
-];
-
-
-// Si ya está autenticado, omitir pantalla
-if (localStorage.getItem(AUTH_KEY)) {
-  document.getElementById("pinScreen").style.display = "none";
-} else {
-  document.body.style.overflow = "hidden"; // bloquear scroll
-}
-
-const usedPins = JSON.parse(localStorage.getItem(USED_PINS_KEY) || "[]");
-
-document.getElementById("verifyPin").onclick = async () => {
-  const input = document.getElementById("pinInput").value.trim();
-  const msg = document.getElementById("pinMsg");
-  if (!input) return (msg.textContent = "Enter PIN");
-
-  const hash = await sha256Hex(input);
-
-  if (usedPins.includes(hash)) {
-    msg.textContent = "❌ PIN already used";
-    return;
-  }
-
-  if (STORED_HASHES.includes(hash)) {
-    msg.textContent = "✅ Access granted";
-    usedPins.push(hash);
-    localStorage.setItem(USED_PINS_KEY, JSON.stringify(usedPins));
-    localStorage.setItem(AUTH_KEY, "1");
-    setTimeout(() => {
-      document.getElementById("pinScreen").style.display = "none";
-      document.body.style.overflow = "auto";
-    }, 800);
-  } else {
-    msg.textContent = "❌ Invalid PIN";
-  }
-};
-
-// --- SHA-256 hash function ---
-async function sha256Hex(str) {
-  const buf = new TextEncoder().encode(str);
-  const hashBuf = await crypto.subtle.digest("SHA-256", buf);
-  const hashArray = Array.from(new Uint8Array(hashBuf));
-  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-}
-</script>
 
 
   <header>
@@ -538,6 +432,7 @@ setTimeout(() => {
 </style>
 </body>
 </html>
+
 
 
 
