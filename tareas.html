@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Smile Task Manager</title>
+<title>Smile Task Manager — Demo (Payment Simulation)</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -55,6 +55,7 @@
 </style>
 </head>
 <body>
+
 
 
   <header>
@@ -241,6 +242,9 @@ function typeSmile(text){
   step();
 }
 
+/* ---------------------------
+   Notifications (12 hours) - enabled manually
+   --------------------------- */
 const notifPhrases = [
   "Smile says: Don't forget to check your tasks!",
   "Time to get things done!",
@@ -286,7 +290,7 @@ function renderAchievementsIfAny(){ /* no achievements UI in this layout; kept f
    Utilities
    --------------------------- */
 function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
-  /* 🔔 NOTIFICACIONES CADA 12 HORAS */
+/* 🔔 NOTIFICACIONES CADA 12 HORAS */
 async function requestNotificationPermission() {
   if (!("Notification" in window)) {
     console.log("Tu navegador no soporta notificaciones.");
@@ -324,74 +328,6 @@ setInterval(() => {
  <a href="index.html" id="fixed-btn">volver</a>
 
 <style>
-/* ✅ Estilo responsivo mejorado para móviles */
-@media (max-width: 768px) {
-  body {
-    font-size: 10px;
-    padding: 10px;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #mainContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-  }
-
-  .smile-section,
-  .task-section {
-    width: 95%;
-    max-width: 380px;
-    margin: 0 auto;
-  }
-
-  .task-section input,
-  .task-section select,
-  .task-section button {
-    font-size: 10px;
-    width: 100%;
-    margin: 5px 0;
-    box-sizing: border-box;
-  }
-
-  .task-item {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  .task-item button {
-    width: 100%;
-    text-align: center;
-    margin-top: 5px;
-  }
-
-  #countdown {
-    display: block;
-    position: static;
-    margin: 10px auto;
-    text-align: center;
-    font-size: 11px;
-  }
-
-  h1, h2 {
-    font-size: 12px;
-    text-align: center;
-  }
-
-  .progress-bar {
-    width: 100%;
-    height: 10px;
-  }
-}
-
   #fixed-btn {
     position: fixed;
     bottom: 20px;
@@ -422,7 +358,7 @@ setInterval(() => {
       right: 10px;
     }
   }
-    /* 📱 Ajuste completo para móviles */
+  /* 📱 Ajuste completo para móviles */
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
@@ -456,9 +392,11 @@ setInterval(() => {
     width: 100%;
   }
 }
+
 </style>
 </body>
 </html>
+
 
 
 
