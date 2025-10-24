@@ -394,8 +394,40 @@ setInterval(() => {
 }
 
 </style>
+  <script>
+ 
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").then(() => {
+      console.log("Service Worker registered!");
+    });
+  }
+
+
+  const enableBtn = document.getElementById("notifyBtn");
+
+  if (enableBtn) {
+    enableBtn.addEventListener("click", async () => {
+      if (!("Notification" in window)) {
+        alert("Your browser doesn't support notifications.");
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        new Notification("Smile 🦊", {
+          body: "Notifications enabled successfully!",
+          icon: "logo.png",
+        });
+      } else {
+        alert("You blocked notifications 😢");
+      }
+    });
+  }
+</script>
+
 </body>
 </html>
+
 
 
 
